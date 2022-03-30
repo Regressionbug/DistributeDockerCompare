@@ -23,7 +23,7 @@ public class TranFileTreeNode implements Writable {
     //用于序列化时传递子节点数组
     private String tranString;
     private int[] directSubNodeId;
-//    private ArrayList<TranFileTreeNode> subList;
+    private ArrayList<TranFileTreeNode> subList;
 
 
 
@@ -55,7 +55,9 @@ public class TranFileTreeNode implements Writable {
     public TranFileTreeNode(FileTreeNode node){
         this.nodeId = node.getNodeId();
         this.nodeName = node.getNodeName();
-        this.fatherNodeId = node.getFatherNode().getNodeId();
+        if(node.getFatherNode()!=null){
+            this.fatherNodeId = node.getFatherNode().getNodeId();
+        }
         int length = node.getDirctSubNodeNum();
         int index = 0;
         StringBuilder builder = new StringBuilder();
@@ -133,11 +135,11 @@ public class TranFileTreeNode implements Writable {
         this.fatherNodeId = fatherNodeId;
     }
 
-//    public ArrayList<TranFileTreeNode> getSubList() {
-//        return subList;
-//    }
-//
-//    public void setSubList(ArrayList<TranFileTreeNode> subList) {
-//        this.subList = subList;
-//    }
+    public ArrayList<TranFileTreeNode> getSubList() {
+        return subList;
+    }
+
+    public void setSubList(ArrayList<TranFileTreeNode> subList) {
+        this.subList = subList;
+    }
 }

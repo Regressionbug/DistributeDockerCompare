@@ -42,12 +42,12 @@ public class DayCountDriver {
         job.setReducerClass(DayCountReducer.class);
 
         job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(NewFileTreeNode.class);
+        job.setMapOutputValueClass(TranFileTreeNode.class);
         //不需要变化按照key排序，因为默认升序
 //        job.setSortComparatorClass(SortComparator.class);
 
         job.setOutputKeyClass(IntWritable.class);
-        job.setOutputValueClass(NewFileTreeNode.class);
+        job.setOutputValueClass(TranFileTreeNode.class);
 
 //        job.setOutputFormatClass(DayCountOutputFormat.class);
 

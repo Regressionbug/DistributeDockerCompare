@@ -19,9 +19,9 @@ import java.util.LinkedList;
 import static lxh.Image.ImageUtils.analyseTarAndBuildTree;
 
 
-public class DayCountMapper extends Mapper<LongWritable, Text, IntWritable, NewFileTreeNode> {
+public class DayCountMapper extends Mapper<LongWritable, Text, IntWritable, TranFileTreeNode> {
 
-    private NewFileTreeNode v = new NewFileTreeNode();
+    private TranFileTreeNode v = new TranFileTreeNode();
     private IntWritable k = new IntWritable();
 
     private static int index=0;
@@ -33,45 +33,45 @@ public class DayCountMapper extends Mapper<LongWritable, Text, IntWritable, NewF
         // 获取地址
         String str = value.toString();
 //        context.write(new IntWritable(1),new TranFileTreeNode());
-        //构建树以及树节点
-//        InputStream in = new BufferedInputStream(new FileInputStream(str));
-//        TarArchiveInputStream tarIn = new TarArchiveInputStream(in);
-//        ArchiveEntry tea = null;
-//        ArrayList<FileTreeNode> layerTrees = new ArrayList<>();
-//        while ((tea = tarIn.getNextEntry())!=null){
-//            if(tea.isDirectory()){
-////                System.out.println(ze.getName()+" directory");
-////                zin.skip(ze.getSize());
-//            }
-//            else {
-////                if(ze.getName().equals("manifest.json")) {
-////                    findManifestResult(zin);
-////                }
-//                if(tea.getName().contains("layer.tar")){
-//                    layerTrees.add(analyseTarAndBuildTree(tarIn));
+//        构建树以及树节点
+        InputStream in = new BufferedInputStream(new FileInputStream(str));
+        TarArchiveInputStream tarIn = new TarArchiveInputStream(in);
+        ArchiveEntry tea = null;
+        ArrayList<FileTreeNode> layerTrees = new ArrayList<>();
+        while ((tea = tarIn.getNextEntry())!=null){
+            if(tea.isDirectory()){
+//                System.out.println(ze.getName()+" directory");
+//                zin.skip(ze.getSize());
+            }
+            else {
+//                if(ze.getName().equals("manifest.json")) {
+//                    findManifestResult(zin);
 //                }
-//            }
-//        }
-//        int treeId = TreeNodeUtils.getNowTreeId();
-//        FileTreeNode tempNode;
-//        //层序遍历节点,并构建新节点
-//        for(FileTreeNode node : layerTrees){
-//            LinkedList<FileTreeNode> list = new LinkedList<>();
-//            list.add(node);
-//            while(!list.isEmpty()){
-//                tempNode =  list.remove();
-//                if(tempNode.getDirctSubNodeNum()!=0){
-//                    list.addAll(tempNode.getSubNode());
-//                }
-//                TranFileTreeNode tranFileTreeNode = new TranFileTreeNode(tempNode);
-//                tranFileTreeNode.setTreeId(treeId);
-//                int blockId = TreeNodeUtils.genBlockId(tempNode.getSubNodeNum(),tempNode.getLevel(),tempNode.getDirctSubNodeNum());
-//                context.write(new IntWritable(blockId),tranFileTreeNode);
-//            }
-//        }
+                if(tea.getName().contains("layer.tar")){
+                    layerTrees.add(analyseTarAndBuildTree(tarIn));
+                }
+            }
+        }
+        int treeId = TreeNodeUtils.getNowTreeId();
+        FileTreeNode tempNode;
+        //层序遍历节点,并构建新节点
+        for(FileTreeNode node : layerTrees){
+            LinkedList<FileTreeNode> list = new LinkedList<>();
+            list.add(node);
+            while(!list.isEmpty()){
+                tempNode =  list.remove();
+                if(tempNode.getDirctSubNodeNum()!=0){
+                    list.addAll(tempNode.getSubNode());
+                }
+                TranFileTreeNode tranFileTreeNode = new TranFileTreeNode(tempNode);
+                tranFileTreeNode.setTreeId(treeId);
+                int blockId = TreeNodeUtils.genBlockId(tempNode.getSubNodeNum(),tempNode.getLevel(),tempNode.getDirctSubNodeNum());
+                context.write(new IntWritable(blockId),tranFileTreeNode);
+            }
+        }
         //获取对象信息
-        v.setNodeId(TreeNodeUtils.getTheTreeNodeId());
-        k.set(1);
+//        v.setNodeId(TreeNodeUtils.getTheTreeNodeId());
+//        k.set(1);
         // 切割字段
 //        String[] fields = line.trim().split(",");
         // 封装对象
@@ -88,7 +88,7 @@ public class DayCountMapper extends Mapper<LongWritable, Text, IntWritable, NewF
 //        v.setCured(cured);
 //        v.setDead(dead);
 
-        context.write(k,v);
+//        context.write(k,v);
 //        v.setNodeId(TreeNodeUtils.getTheTreeNodeId());
 //        context.write(k,v);
     }
