@@ -21,7 +21,7 @@ public class TranFileTreeNode implements Writable {
     private int groupId = 0;
     private String nodeName;
     //用于序列化时传递子节点数组
-    private String tranString;
+    private String tranString = "-\n";
     private int[] directSubNodeId;
     private ArrayList<TranFileTreeNode> subList;
 
@@ -54,21 +54,32 @@ public class TranFileTreeNode implements Writable {
     public TranFileTreeNode(){};
     public TranFileTreeNode(FileTreeNode node){
         this.nodeId = node.getNodeId();
-        this.nodeName = node.getNodeName();
+        this.nodeName = node.getNodeName()+"\n";
         if(node.getFatherNode()!=null){
             this.fatherNodeId = node.getFatherNode().getNodeId();
         }
         int length = node.getDirctSubNodeNum();
-        int index = 0;
-        StringBuilder builder = new StringBuilder();
-        for(;index<length;index++){
-            FileTreeNode node1 = node.getSubNode().get(index);
-            builder.append(node1.getNodeId());
-            if(index!=length-1){
-                builder.append("|");
+        if(length>0) {
+            int index = 0;
+            StringBuilder builder = new StringBuilder();
+            for (; index < length; index++) {
+                FileTreeNode node1 = node.getSubNode().get(index);
+                builder.append(node1.getNodeId());
+                if (index != length - 1) {
+                    builder.append("|");
+                }
             }
+            this.tranString = builder.toString() + "\n";
         }
-        this.tranString = builder.toString();
+    }
+
+    public TranFileTreeNode(TranFileTreeNode node){
+        this.treeId = node.getTreeId();
+        this.nodeId = node.getNodeId();
+        this.fatherNodeId = node.getFatherNodeId();
+        this.nodeName = node.nodeName;
+        this.tranString = node.getTranString();
+        this.directSubNodeId = node.getDirectSubNodeId();
     }
 
     public int getTreeId() {

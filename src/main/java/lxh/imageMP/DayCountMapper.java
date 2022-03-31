@@ -28,30 +28,34 @@ public class DayCountMapper extends Mapper<LongWritable, Text, IntWritable, Tran
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        //删除文件夹
-
+        //没进入一个map就是一棵树,t用threadLocal中的值记录nodeId
+        TreeNodeUtils.initNowNodeId();
         // 获取地址
         String str = value.toString();
 //        context.write(new IntWritable(1),new TranFileTreeNode());
 //        构建树以及树节点
         InputStream in = new BufferedInputStream(new FileInputStream(str));
-        TarArchiveInputStream tarIn = new TarArchiveInputStream(in);
-        ArchiveEntry tea = null;
+//        TarArchiveInputStream tarIn = new TarArchiveInputStream(in);
+//        ArchiveEntry tea = null;
         ArrayList<FileTreeNode> layerTrees = new ArrayList<>();
-        while ((tea = tarIn.getNextEntry())!=null){
-            if(tea.isDirectory()){
-//                System.out.println(ze.getName()+" directory");
-//                zin.skip(ze.getSize());
-            }
-            else {
-//                if(ze.getName().equals("manifest.json")) {
-//                    findManifestResult(zin);
+        //需要
+//        while ((tea = tarIn.getNextEntry())!=null){
+//            if(tea.isDirectory()){
+////                System.out.println(ze.getName()+" directory");
+////                zin.skip(ze.getSize());
+//            }
+//            else {
+////                if(ze.getName().equals("manifest.json")) {
+////                    findManifestResult(zin);
+////                }
+//                if(tea.getName().contains("layer.tar")){
+
+//                    layerTrees.add(analyseTarAndBuildTree(tarIn));
 //                }
-                if(tea.getName().contains("layer.tar")){
-                    layerTrees.add(analyseTarAndBuildTree(tarIn));
-                }
-            }
-        }
+//            }
+//        }
+
+        layerTrees.add(analyseTarAndBuildTree(in));
         int treeId = TreeNodeUtils.getNowTreeId();
         FileTreeNode tempNode;
         //层序遍历节点,并构建新节点

@@ -4,6 +4,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -16,19 +17,22 @@ import static lxh.Image.TreeNodeUtils.*;
  * @whatItFor
  */
 public class ImageUtils {
-    public static FileTreeNode analyseTarAndBuildTree(TarArchiveInputStream fileInputStream) throws IOException {
+    public static FileTreeNode analyseTarAndBuildTree(InputStream fileInputStream) throws IOException {
         TarArchiveInputStream inputStream = new TarArchiveInputStream(fileInputStream);
         ArchiveEntry tae = null;
         int tempLevel = 0;
         //由于是深度优先，所以这个treeStruct相当于从根节点到目前访问点的通路记录，对于整体的
         LinkedList<FileTreeNode> treeStruct = new LinkedList<>();
+        //这里需要直接设置
         FileTreeNode node = new FileTreeNode("layer1",0);
+        node.setNodeId(TreeNodeUtils.getNowNodeId());
         treeStruct.add(node);
         while ((tae = inputStream.getNextEntry())!= null) {
             if(tae.isDirectory()){
                 String dirStr = tae.getName();
                 System.out.println(dirStr);
                 FileTreeNode tempNode = new FileTreeNode();
+                tempNode.setNodeId(TreeNodeUtils.getNowNodeId());
                 //通过除号的数量来标识级别
                 getDirLevelAndName(tae.getName(),tempNode);
                 tempLevel = tempNode.getLevel();
@@ -50,10 +54,16 @@ public class ImageUtils {
                 //调整完之后，将最新节点加入treeStruct
                 treeStruct.add(tempNode);
                 //设置父子节点的关系
-                FileTreeNode fatherNode = treeStruct.get(tempLevel-1);
-                tempNode.setFatherNode(fatherNode);
-                ArrayList<FileTreeNode> subNode = fatherNode.getSubNode();
-                subNode.add(tempNode);
+                if(treeStruct.size()>=2) {
+                    FileTreeNode fatherNode = treeStruct.get(treeStruct.size() - 2);
+                    tempNode.setFatherNode(fatherNode);
+                    ArrayList<FileTreeNode> subNode = fatherNode.getSubNode();
+                    subNode.add(tempNode);
+                }
+                else if(treeStruct.size()==1) {
+                    ArrayList<FileTreeNode> subNode = treeStruct.get(0).getSubNode();
+                    subNode.add(tempNode);
+                }
             }
         }
         //对于剩下的文件夹进行调整

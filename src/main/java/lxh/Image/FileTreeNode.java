@@ -94,6 +94,11 @@ FileTreeNode {
         this.level = level;
     }
 
+    public FileTreeNode(String nodeName, int level, int nodeId){
+        this(nodeName,level);
+        this.nodeId = nodeId;
+    }
+
     public int getNodeId() {
         return nodeId;
     }

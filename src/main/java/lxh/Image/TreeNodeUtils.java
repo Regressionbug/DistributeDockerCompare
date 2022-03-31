@@ -1,5 +1,7 @@
 package lxh.Image;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.*;
 
 /**
@@ -13,6 +15,7 @@ public class TreeNodeUtils {
     //用来记录树的标号
     private static int nowTreeId = 0;
     private static int groupId = 0;
+    private static ThreadLocal<Integer> nowNodeId = new ThreadLocal<>();
 
     private static int theTreeNodeId;
 
@@ -23,21 +26,47 @@ public class TreeNodeUtils {
         theTreeNodeId = 0;
     }
 
+    public static int getNowNodeId(){
+        int result = nowNodeId.get();
+        nowNodeId.set(result+1);
+        return result;
+    }
+
+    public static void initNowNodeId(){
+        nowNodeId.set(0);
+    }
+
+
+
     public synchronized static int getGroupId() {
         groupId++;
         return groupId;
     }
 
-    public static void tranformTreeNode(TranFileTreeNode node){
+    //返回值表示传递是否是有效的转换值，只有是有效时才进行转换
+    public static boolean tranformTreeNode(TranFileTreeNode node){
         String tranString = node.getTranString();
-        String[] strings = tranString.split("|");
-        int[] subNodes = new int[strings.length];
-        int index = 0;
+        String afterString = transFrom(tranString);
+        node.setTranString(afterString);
+
+        if(afterString.charAt(0)=='-'){
+            return false;
+        }
+        String[] strings = afterString.split("|");
+        ArrayList<Integer> list = new ArrayList<>();
         for(String str : strings){
-            int a = Integer.parseInt(str);
-            subNodes[index++] = a;
+            if(StringUtils.isNumeric(str)) {
+                int a = Integer.parseInt(str);
+                list.add(a);
+            }
+        }
+        int index = 0;
+        int[] subNodes = new int[list.size()];
+        for(Integer b : list){
+            subNodes[index++]=b;
         }
         node.setDirectSubNodeId(subNodes);
+        return true;
     }
 
 
@@ -132,5 +161,17 @@ public class TreeNodeUtils {
             }
         }
 
+    }
+
+    //发现在传递中，其会自动在字符串中的字符周围加入0字符，需要去除得到原字符
+    public static String transFrom(String str){
+        int length = str.length();
+        int index = 1;
+        StringBuilder stringBuilder = new StringBuilder();
+        while(index<length){
+            stringBuilder.append(str.charAt(index));
+            index+=2;
+        }
+        return stringBuilder.toString();
     }
 }
