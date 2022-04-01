@@ -20,7 +20,11 @@ FileTreeNode {
     boolean inGroup = false;
     int groupId = 0;
 
-
+    public FileTreeNode(String nodeName, boolean inGroup, int groupId) {
+        this.nodeName = nodeName;
+        this.inGroup = inGroup;
+        this.groupId = groupId;
+    }
 
     public boolean isInGroup() {
         return inGroup;

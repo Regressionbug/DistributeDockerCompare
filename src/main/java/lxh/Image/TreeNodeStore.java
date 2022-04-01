@@ -22,4 +22,12 @@ public class TreeNodeStore {
     public static void setTreeStore(HashMap<Integer, ArrayList<TranFileTreeNode>> treeStore) {
         TreeNodeStore.treeStore = treeStore;
     }
+    //放置节点
+    public static void putTreeNode(TranFileTreeNode node){
+        int treeId = node.getTreeId();
+        int nodeId = node.getNodeId();
+        ArrayList<TranFileTreeNode> treeStruct = treeStore.getOrDefault(treeId,new ArrayList<>());
+        treeStruct.add(nodeId,node);
+        treeStore.put(treeId,treeStruct);
+    }
 }

@@ -128,39 +128,40 @@ public class TreeNodeUtils {
         return 100*100*subNum+100*level+dirSubNum;
     }
 
-    public static void findSameSubNode(ArrayList<ArrayList<FileTreeNode>> targetList, ArrayList<ArrayList<ArrayList<FileTreeNode>>> result
-                                          ,int index, int length){
-        HashMap<String,ArrayList<ArrayList<FileTreeNode>>> compareResult = new HashMap<>();
 
-        for(ArrayList<FileTreeNode> list: targetList){
-            FileTreeNode node = list.get(index);
-            if(node.getDirctSubNodeNum() == 0){
+    public static void findSameSubNode(ArrayList<ArrayList<TranFileTreeNode>> targetList, ArrayList<ArrayList<ArrayList<TranFileTreeNode>>> result
+                                          ,int index, int length){
+        //用于存储每个名字对应的节点
+        HashMap<String,ArrayList<ArrayList<TranFileTreeNode>>> compareResult = new HashMap<>();
+
+        for(ArrayList<TranFileTreeNode> list: targetList) {
+            TranFileTreeNode node = list.get(index);
+            if (node.getSubList().size() == 0) {
                 //单节点（没有子节点）情况
-                ArrayList<ArrayList<FileTreeNode>> templist = compareResult.getOrDefault(node.getNodeName(),new ArrayList<ArrayList<FileTreeNode>>());
+                ArrayList<ArrayList<TranFileTreeNode>> templist = compareResult.getOrDefault(node.getNodeName(), new ArrayList<ArrayList<TranFileTreeNode>>());
                 templist.add(list);
-                compareResult.put(node.getNodeName(),templist);
-            }
-            else {
+                compareResult.put(node.getNodeName(), templist);
+            } else {
                 //非单节点
-                if(node.isInGroup()){
-                    String theKey = node.getGroupId()+node.getNodeName();
-                    ArrayList<ArrayList<FileTreeNode>> templist = compareResult.getOrDefault(theKey,new ArrayList<ArrayList<FileTreeNode>>());
+                if (node.isGroup()) {
+                    String theKey = node.getGroupId() + node.getNodeName();
+                    ArrayList<ArrayList<TranFileTreeNode>> templist = compareResult.getOrDefault(theKey, new ArrayList<ArrayList<TranFileTreeNode>>());
                     templist.add(list);
-                    compareResult.put(theKey,templist);
+                    compareResult.put(theKey, templist);
                 }
             }
-            for(ArrayList<ArrayList<FileTreeNode>> resultList : compareResult.values()){
+        }
+            for(ArrayList<ArrayList<TranFileTreeNode>> resultList : compareResult.values()){
                 if(resultList.size() >= 2){
                     if(index==length-1){
                         result.add(resultList);
                     }
                     else{
+                        //继续迭代
                         findSameSubNode(resultList,result,index+1,length);
                     }
                 }
             }
-        }
-
     }
 
     //发现在传递中，其会自动在字符串中的字符周围加入0字符，需要去除得到原字符
